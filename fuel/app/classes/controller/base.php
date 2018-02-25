@@ -3,7 +3,7 @@ use \Firebase\JWT\JWT;
 
 class Controller_Base extends Controller_Rest
 {
-    private $key = "fnap3se2ghseo35g53ha7sopghseufhr378562387itgri6odfgou83";
+    private $key = "fnap3@{ç}se2ghseo35g##53ha7s{key}opg@hseufhr378562387itgri6od/e5urj@#~62474734{[}]]|#~{#7382fgou83";
 
     protected function obtainData($users)
     {
@@ -177,38 +177,11 @@ class Controller_Base extends Controller_Rest
         $cost = 8;
         do {
             $cost++;
-            $inicio = microtime(true);
+            $init = microtime(true);
             $pass = password_hash($userPass, PASSWORD_BCRYPT, ["cost" => $cost]);
-            $fin = microtime(true);
-        } while (($fin - $inicio) < $timeTarget);
+            $end = microtime(true);
+        } while (($end - $init) < $timeTarget);
 
         return $pass;
-    }
-
-    protected function AuthError(){
-        $response = $this->response(array(
-            'code' => 400,
-            'message' => 'Error de autenticacion',
-            'data' => ''
-        ));
-        return $response;
-    }
-
-    protected function EmptyError(){
-        $response = $this->response(array(
-            'code' => 400,
-            'message' => 'Debes rellenar todos los indices',
-            'data' => ''
-        ));
-        return $response;
-    }
-
-    protected function ServerError(){
-        $response = $this->response(array(
-            'code' => 500,
-            'message' => 'Error del servidor',
-            'data' => ''
-        ));
-        return $response;
     }
 }

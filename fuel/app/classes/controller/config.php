@@ -13,12 +13,8 @@ class Controller_Config extends Controller_Base
             ));
 
             if(!empty($rols)){
-                $response = $this->response(array(
-                    'code' => 400,
-                    'message' => 'Aviso: La configuracion ya ha sido realizada',
-                    'data' => ''
-                ));
-                return $response;
+
+                return $this->JSONResponse(400, 'Aviso: La configuracion de roles ya ha sido realizada', '');
             }
             else
             {
@@ -30,17 +26,12 @@ class Controller_Config extends Controller_Base
                 $rol->type = 'standard';
                 $rol->save();
 
-                $response = $this->response(array(
-                    'code' => 200,
-                    'message' => 'Roles creados con exito',
-                    'data' => ''
-                ));
-                return $response;
+                return $this->JSONResponse(200, 'Roles creados con exito', '');
             }  
         }
         catch (Exception $e)
         {
-            return $this->ServerError();
+            return $this->JSONResponse(500, 'Error del servidor : $e', '');
         }
     }
 
@@ -69,18 +60,14 @@ class Controller_Config extends Controller_Base
                     }
                 }
 
-                if($adminCount >= $maxAdmins){
-                    $response = $this->response(array(
-                        'code' => 400,
-                        'message' => 'Aviso: La configuracion ya ha sido realizada',
-                        'data' => count($users)
-                    ));
-                    return $response;
+                if($adminCount >= $maxAdmins)
+                {
+                    return $this->JSONResponse(400, 'Aviso: La configuracion de administradores ya ha sido realizada', count($users));
                 }
 
                 if(!isset($_POST['name']) || !isset($_POST['pass']) || !isset($_POST['email']))
                 {
-                    $this->EmptyError();
+                    return $this->JSONResponse(400, 'Debes rellenar todos los campos', '');
                 }
 
                 $input = $_POST;
@@ -97,12 +84,7 @@ class Controller_Config extends Controller_Base
 
                 if(!empty($usersName))
                 {
-                    $response = $this->response(array(
-                        'code' => 400,
-                        'message' => 'Ese nombre de usuario ya esta registrado',
-                        'data' => ''
-                    ));
-                    return $response;
+                    return $this->JSONResponse(400, 'Ese nombre de usuario ya esta registrado', '');
                 }
 
                 $usersEmail = Model_Users::find('all', array(
@@ -113,12 +95,7 @@ class Controller_Config extends Controller_Base
 
                 if(!empty($usersEmail))
                 {
-                    $response = $this->response(array(
-                        'code' => 400,
-                        'message' => 'Ese email ya esta registrado',
-                        'data' => ''
-                    ));
-                    return $response;
+                    return $this->JSONResponse(400, 'Ese email ya esta registrado', '');
                 }
 
                 $admin = new Model_Users();
@@ -163,36 +140,21 @@ class Controller_Config extends Controller_Base
                         $list->save();
                     }
 
-                    $response = $this->response(array(
-                        'code' => 200,
-                        'message' => 'Admin creado con exito',
-                        'data' => ''
-                    ));
-                    return $response;
+                    return $this->JSONResponse(400, 'Admin creado con exito', '');
                 }
                 else
                 {
-                    $response = $this->response(array(
-                        'code' => 400,
-                        'message' => 'Rol no encontrado',
-                        'data' => ''
-                    ));
-                    return $response;
+                    return $this->JSONResponse(400, 'Rol no encontrado', '');
                 }
             }
             else
             {
-                $response = $this->response(array(
-                    'code' => 400,
-                    'message' => 'Aviso: La api aun no ha sido configurada (Rols)',
-                    'data' => ''
-                ));
-                return $response;
+                return $this->JSONResponse(400, 'Aviso: Los roles aun no an sido configurados', '');
             }
     	}
         catch (Exception $e)
         {
-            return $this->ServerError();
+            return $this->JSONResponse(500, 'Error del servidor : $e', '');
         }
     }
 
@@ -209,14 +171,14 @@ class Controller_Config extends Controller_Base
             }
             else
             {
-                return $this->AuthError();
+                return $this->JSONResponse(400, 'Error de autenticación', '');
             }
 
             if($user->rol['type'] == 'admin')
             {
                 if(!isset($_POST['name']))
                 {
-                    return $this->EmptyError();
+                    return $this->JSONResponse(400, 'Debes rellenar todos los campos', '');
                 }
 
                 $info = $this->getUserInfo();
@@ -234,12 +196,7 @@ class Controller_Config extends Controller_Base
 
                 if(!empty($listName))
                 {
-                    $response = $this->response(array(
-                        'code' => 400,
-                        'message' => 'Esa lista ya existe',
-                        'data' => ''
-                    ));
-                    return $response;
+                    return $this->JSONResponse(400, 'Esa lista ya existe', '');
                 }
 
                 $list = new Model_Lists();
@@ -248,22 +205,16 @@ class Controller_Config extends Controller_Base
                 $list->user = Model_Users::find($info['id']);
                 $list->save();
 
-                $response = $this->response(array(
-                    'code' => 200,
-                    'message' => 'Lista creada',
-                    'data' => ''
-                ));
-
-                return $response;
+                return $this->JSONResponse(200, 'Lista creada', '');
             }
             else
             {
-                return $this->AuthError();
+                return $this->JSONResponse(400, 'Error de autenticación', '');
             }
         }
         catch (Exception $e)
         {
-            return $this->ServerError();
+            return $this->JSONResponse(500, 'Error del servidor : $e', '');
         }
     }
 
@@ -280,14 +231,14 @@ class Controller_Config extends Controller_Base
             }
             else
             {
-                return $this->AuthError();
+                return $this->JSONResponse(400, 'Error de autenticación', '');
             }
 
             if($user->rol['type'] == 'admin')
             {
                 if(!isset($_POST['name']) || !isset($_POST['newName']) || !isset($_POST['id']))
                 {
-                    return $this->EmptyError();
+                    return $this->JSONResponse(400, 'Debes rellenar todos los campos', '');
                 }
 
                 $input = $_POST;
@@ -305,12 +256,7 @@ class Controller_Config extends Controller_Base
 
                     if(!empty($nameLists))
                     {
-                        $response = $this->response(array(
-                            'code' => 400,
-                            'message' => 'El nombre de esa lista ya existe',
-                            'data' => ''
-                        ));
-                        return $response;
+                        return $this->JSONResponse(400, 'El nombre de esa lista ya existe', '');
                     }
 
                     $query = DB::update('lists');
@@ -318,30 +264,21 @@ class Controller_Config extends Controller_Base
                     $query->value('name', $input['newName']);
                     $query->execute();
 
-                    $response = $this->response(array(
-                        'code' => 200,
-                        'message' => 'Nombre cambiado',
-                        'data' => ''
-                    ));
+                    return $this->JSONResponse(200, 'Nombre cambiado', '');
                 }
                 else
                 {
-                    $response = $this->response(array(
-                    'code' => 400,
-                    'message' => 'Esa lista no existe',
-                    'data' => ''
-                    ));
-                    return $response;
+                    return $this->JSONResponse(400, 'Esa lista no existe', '');
                 }
             }
             else
             {
-                return $this->AuthError();
+                return $this->JSONResponse(400, 'Error de autenticación', '');
             }
         }
         catch (Exception $e)
         {
-            return $this->ServerError();
+            return $this->JSONResponse(500, 'Error del servidor : $e', '');
         }
     }
 
@@ -358,14 +295,14 @@ class Controller_Config extends Controller_Base
             }
             else
             {
-                return $this->AuthError();
+                return $this->JSONResponse(400, 'Error de autenticación', '');
             }
 
             if($user->rol['type'] == 'admin')
             {
                 if(!isset($_POST['name']))
                 {
-                    return $this->EmptyError();
+                    return $this->JSONResponse(400, 'Debes rellenar todos los campos', '');
                 }
 
                 $info = $this->getUserInfo();
@@ -377,31 +314,21 @@ class Controller_Config extends Controller_Base
                 {
                     $userList->delete();
 
-                    $response = $this->response(array(
-                        'code' => 200,
-                        'message' => 'Lista borrada',
-                        'data' => ''
-                    ));
-                    return $response;
+                    return $this->JSONResponse(200, 'Lista borrada', '');
                 }
                 else
                 {
-                    $response = $this->response(array(
-                    'code' => 400,
-                    'message' => 'Esa lista no existe',
-                    'data' => ''
-                    ));
-                    return $response;
+                    return $this->JSONResponse(400, 'Esa lista no existe', '');
                 }
             }
             else
             {
-                return $this->AuthError();
+                return $this->JSONResponse(400, 'Error de autenticación', '');
             }
         }
         catch (Exception $e)
         {
-            return $this->ServerError();
+            return $this->JSONResponse(500, 'Error del servidor : $e', '');
         }
     }
 }

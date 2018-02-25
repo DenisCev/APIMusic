@@ -11,7 +11,7 @@ class Controller_List extends Controller_Base
             {
         		if(!isset($_POST['name']))
                 {
-                    return $this->EmptyError();
+                    return $this->JSONResponse(400, 'Debes rellenar todos los campos', '');
                 }
 
                 $info = $this->getUserInfo();
@@ -31,12 +31,7 @@ class Controller_List extends Controller_Base
 
                     if(!empty($listName))
                     {
-                        $response = $this->response(array(
-                            'code' => 400,
-                            'message' => 'Esa lista ya existe',
-                            'data' => ''
-                        ));
-                        return $response;
+                        return $this->JSONResponse(400, 'Esa lista ya existe', '');
                     }
 
                     $list = new Model_Lists();
@@ -45,32 +40,21 @@ class Controller_List extends Controller_Base
                     $list->user = Model_Users::find($info['id']);
                     $list->save();
 
-                    $response = $this->response(array(
-                        'code' => 200,
-                        'message' => 'lista creada',
-                        'data' => ''
-                    ));
-
-                    return $response;
+                    return $this->JSONResponse(200, 'Lista creada', '');
                 }
                 else
                 {
-                    $response = $this->response(array(
-                    'code' => 400,
-                    'message' => $checkName['msgError'],
-                    'data' => ''
-                    ));
-                    return $response;
+                    return $this->JSONResponse(400, $checkName['msgError'], '');
                 }
             }
             else
             {
-                return $this->AuthError();
+                return $this->JSONResponse(400, 'Error de autenticación', '');
             }
         }
         catch (Exception $e)
         {
-            return $this->ServerError();
+            return $this->JSONResponse(500, 'Error del servidor : $e', '');
         }
     }
 
@@ -84,7 +68,7 @@ class Controller_List extends Controller_Base
             {
                 if(!isset($_POST['id_song']) || !isset($_POST['id_list']))
                 {
-                    $this->EmptyError();
+                    return $this->JSONResponse(400, 'Debes rellenar todos los campos', '');
                 }
 
                 $info = $this->getUserInfo();
@@ -95,24 +79,14 @@ class Controller_List extends Controller_Base
 
                 if(empty($list))
                 {
-                    $response = $this->response(array(
-                        'code' => 400,
-                        'message' => 'Esa lista no existe',
-                        'data' => ''
-                    ));
-                    return $response;
+                    return $this->JSONResponse(400, 'Esa lista no existe', '');
                 }
 
                 $song = Model_Songs::find($input['id_song']);
 
                 if(empty($song))
                 {
-                    $response = $this->response(array(
-                        'code' => 400,
-                        'message' => 'Esa cancion no existe',
-                        'data' => ''
-                    ));
-                    return $response;
+                    return $this->JSONResponse(400, 'Esa cancion no existe', '');
                 }
 
                 $addName = Model_Add::find('all', array(
@@ -124,33 +98,23 @@ class Controller_List extends Controller_Base
 
                 if(!empty($addName))
                 {
-                    $response = $this->response(array(
-                        'code' => 400,
-                        'message' => 'Esa cancion ya existe en esta lista',
-                        'data' => ''
-                    ));
-                    return $response;
+                    return $this->JSONResponse(400, 'Esa cancion ya existe en esta lista', '');
                 }
 
                 $list = Model_Lists::find($input['id_list']);
                 $list->song[] = Model_Songs::find($input['id_song']);
                 $list->save();
 
-                $response = $this->response(array(
-                    'code' => 200,
-                    'message' => 'Cancion agregada',
-                    'data' => ''
-                ));
-                return $response;
+                return $this->JSONResponse(200, 'Cancion agregada', '');
             }
             else
             {
-                return $this->AuthError();
+                return $this->JSONResponse(400, 'Error de autenticación', '');
             }
         }
         catch (Exception $e)
         {
-            return $this->ServerError();
+            return $this->JSONResponse(500, 'Error del servidor : $e', '');
         }
     }
 
@@ -164,7 +128,7 @@ class Controller_List extends Controller_Base
             {
                 if(!isset($_POST['id_song']) || !isset($_POST['id_list']))
                 {
-                    return $this->EmptyError();
+                    return $this->JSONResponse(400, 'Debes rellenar todos los campos', '');
                 }
 
                 $info = $this->getUserInfo();
@@ -183,32 +147,21 @@ class Controller_List extends Controller_Base
                     {
                         $song->delete();
                     }
-
-                    $response = $this->response(array(
-                        'code' => 200,
-                        'message' => 'Cancion eliminada de la lista',
-                        'data' => ''
-                    ));
-                    return $response;
+                    return $this->JSONResponse(200, 'Cancion eliminada de la lista', '');
                 }
                 else
                 {
-                    $response = $this->response(array(
-                        'code' => 400,
-                        'message' => 'Esa cancion no existe en la lista',
-                        'data' => ''
-                    ));
-                    return $response;
+                    return $this->JSONResponse(400, 'Esa cancion no existe en la lista', '');
                 } 
             }
             else
             {
-                return $this->AuthError();
+                return $this->JSONResponse(400, 'Error de autenticación', '');
             }
         }
         catch (Exception $e)
         {
-            return $this->ServerError();
+            return $this->JSONResponse(500, 'Error del servidor : $e', '');
         }
     }
 
@@ -234,32 +187,21 @@ class Controller_List extends Controller_Base
                     {
                         $lists[] = $list['name'];
                     }
-
-                    $response = $this->response(array(
-                        'code' => 200,
-                        'message' => 'Listas obtenidas',
-                        'data' => $lists
-                    ));
-                    return $response;
+                    return $this->JSONResponse(200, 'Listas obtenidas', $lists);
                 }
                 else
                 {
-                    $response = $this->response(array(
-                        'code' => 400,
-                        'message' => 'No existen listas asociadas a esta cuenta',
-                        'data' => ''
-                    ));
-                    return $response;
+                    return $this->JSONResponse(400, 'No existen listas asociadas a esta cuenta', '');
                 }
             }
             else
             {
-                return $this->AuthError();
+                return $this->JSONResponse(400, 'Error de autenticación', '');
             }
         }
         catch (Exception $e)
         { 
-            return $this->ServerError();
+            return $this->JSONResponse(500, 'Error del servidor : $e', '');
         }
     }
 
@@ -273,12 +215,7 @@ class Controller_List extends Controller_Base
             {
                 if(!isset($_GET['id_list']))
                 {
-                    $response = $this->response(array(
-                        'code' => 400,
-                        'message' => 'Debes rellenar todos los campos',
-                        'data' => ''
-                    ));
-                    return $response;
+                    return $this->JSONResponse(400, 'Debes rellenar todos los campos', '');
                 }
 
                 $info = $this->getUserInfo();
@@ -301,43 +238,27 @@ class Controller_List extends Controller_Base
                     {
                         $songs[] = array(
                             "name" => $song->name,
-                            "side" => $song->side,
-                            "element" => $song->element,
-                            "rarity" => $song->rarity,
-                            "life" => $song->life,
-                            "damage" => $song->damage,
-                            "speed" => $song->speed,
-                            "cadence" => $song->cadence,
-                            "description" => $song->description
+                            "artist" => $song->artist,
+                            "urlSong" => $song->urlSong,
+                            "reproductions" => $song->reproductions
                         );
 
                     }  
-
-                    $response = $this->response(array(
-                        'code' => 200,
-                        'message' => 'Piezas encontradas',
-                        'data' => $songs
-                    ));
-                    return $response;
+                    return $this->JSONResponse(200, 'Canciones encontradas', $songs);
                 }
                 else
                 {
-                   $response = $this->response(array(
-                        'code' => 400,
-                        'message' => 'No existen piezas en esa la lista',
-                        'data' => ''
-                    ));
-                    return $response; 
+                    return $this->JSONResponse(400, 'No existen piezas en esa la lista', '');
                 }
             }
             else
             {
-                return $this->AuthError();
+                return $this->JSONResponse(400, 'Error de autenticación', '');
             }
         }
         catch (Exception $e)
         {
-            return $this->ServerError();
+            return $this->JSONResponse(500, 'Error del servidor : $e', '');
         }
     }
 
@@ -351,7 +272,7 @@ class Controller_List extends Controller_Base
             {
                 if(!isset($_POST['name']) || !isset($_POST['newName']))
                 {
-                    return $this->EmptyError();
+                    return $this->JSONResponse(400, 'Debes rellenar todos los campos', '');
                 }
 
                 $info = $this->getUserInfo();
@@ -373,12 +294,7 @@ class Controller_List extends Controller_Base
                         foreach ($userLists as $key => $list)
                         {
                             if($list->editable == 0){
-                                $response = $this->response(array(
-                                    'code' => 400,
-                                    'message' => 'Esta lista no se puede editar',
-                                    'data' => ''
-                                ));
-                                return $response;
+                                return $this->JSONResponse(400, 'Esta lista no se puede editar', '');
                             }
                         }
 
@@ -391,12 +307,7 @@ class Controller_List extends Controller_Base
 
                         if(!empty($nameLists))
                         {
-                            $response = $this->response(array(
-                                'code' => 400,
-                                'message' => 'El nombre de esa lista ya existe',
-                                'data' => ''
-                            ));
-                            return $response;
+                            return $this->JSONResponse(400, 'El nombre de esa lista ya existe', '');
                         }
 
                         $query = DB::update('lists');
@@ -404,40 +315,26 @@ class Controller_List extends Controller_Base
                         $query->value('name', $input['newName']);
                         $query->execute();
 
-                        $response = $this->response(array(
-                            'code' => 200,
-                            'message' => 'Nombre cambiado',
-                            'data' => ''
-                        ));
+                        return $this->JSONResponse(200, 'Nombre cambiado', '');
                     }
                     else
                     {
-                        $response = $this->response(array(
-                        'code' => 400,
-                        'message' => 'Esa lista no existe',
-                        'data' => ''
-                        ));
-                        return $response;
+                        return $this->JSONResponse(400, 'Esa lista no existe', '');
                     }
                 }
                 else
                 {
-                    $response = $this->response(array(
-                        'code' => 400,
-                        'message' => $checkName['msgError'],
-                        'data' => ''
-                    ));
-                    return $response;
+                    return $this->JSONResponse(400, $checkName['msgError'], '');
                 }
             }
             else
             {
-                return $this->AuthError();
+                return $this->JSONResponse(400, 'Error de autenticación', '');
             }
         }
         catch (Exception $e)
         {
-            return $this->ServerError();
+            return $this->JSONResponse(500, 'Error del servidor : $e', '');
         }
     }
 
@@ -451,7 +348,7 @@ class Controller_List extends Controller_Base
             {
                 if(!isset($_POST['name']))
                 {
-                    return $this->EmptyError();
+                    return $this->JSONResponse(400, 'Debes rellenar todos los campos', '');
                 }
 
                 $info = $this->getUserInfo();
@@ -469,43 +366,28 @@ class Controller_List extends Controller_Base
                     foreach ($userLists as $key => $list)
                     {
                         if($list->editable == 0){
-                            $response = $this->response(array(
-                                'code' => 400,
-                                'message' => 'Esta lista no se puede editar',
-                                'data' => ''
-                            ));
-                            return $response;
+                            return $this->JSONResponse(400, 'Esta lista no se puede editar', '');
                         }
 
                         if($list->editable == 1){
                             $list->delete();
-                            $response = $this->response(array(
-                                'code' => 200,
-                                'message' => 'Lista borrada',
-                                'data' => ''
-                            ));
-                            return $response;
+                            return $this->JSONResponse(200, 'Lista borrada', '');
                         }
                     } 
                 }
                 else
                 {
-                    $response = $this->response(array(
-                    'code' => 400,
-                    'message' => 'Esa lista no existe',
-                    'data' => ''
-                    ));
-                    return $response;
+                    return $this->JSONResponse(400, 'Esa lista no existe', '');
                 }
             }
             else
             {
-                return $this->AuthError();
+                return $this->JSONResponse(400, 'Error de autenticación', '');
             }
         }
         catch (Exception $e)
         {
-            return $this->ServerError();
+            return $this->JSONResponse(500, 'Error del servidor : $e', '');
         }
 	}
 }

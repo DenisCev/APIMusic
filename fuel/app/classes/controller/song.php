@@ -16,7 +16,7 @@ class Controller_Song extends Controller_Base
             }
             else
             {
-                return $this->AuthError();
+                return $this->JSONResponse(400, 'Error de autenticación', '');
             }
 
             if($user->rol['type'] == 'admin')
@@ -26,7 +26,7 @@ class Controller_Song extends Controller_Base
                     !isset($_POST['urlSong']) ||
                     !isset($_POST['reproductions']))
                 {
-                    return $this->EmptyError();
+                    return $this->JSONResponse(400, 'Debes rellenar todos los campos', '');
                 }
 
                 $input = $_POST;
@@ -40,22 +40,16 @@ class Controller_Song extends Controller_Base
                 $song->reproductions = $input['reproductions'];
 
                 $song->save();
-
-                $response = $this->response(array(
-                    'code' => 200,
-                    'message' => 'Cancion creada',
-                    'data' => ''
-                ));
-                return $response;
+                return $this->JSONResponse(200, 'Cancion creada', '');
             }
             else
             {
-            	return $this->AuthError();
+            	return $this->JSONResponse(400, 'Error de autenticación', '');
             }
         }
         catch (Exception $e)
         {
-            return $this->ServerError();
+            return $this->JSONResponse(500, 'Error del servidor : $e', '');
         }
     }
 
@@ -72,7 +66,7 @@ class Controller_Song extends Controller_Base
             }
             else
             {
-                return $this->AuthError();
+                return $this->JSONResponse(400, 'Error de autenticación', '');
             }
 
             if($user->rol['type'] == 'admin')
@@ -84,36 +78,26 @@ class Controller_Song extends Controller_Base
                     if(!empty($song))
                     {
                         $song->delete();
-                        $response = $this->response(array(
-                            'code' => 200,
-                            'message' => 'Cancion borrada',
-                            'data' => ''
-                        ));
-                        return $response;
+                		return $this->JSONResponse(200, 'Cancion borrada', '');
                     }
                     else
                     {
-                        $response = $this->response(array(
-                        'code' => 400,
-                        'message' => 'Esa cancion no existe',
-                        'data' => ''
-                        ));
-                        return $response;
+                		return $this->JSONResponse(400, 'Esa cancion no existe', '');
                     }
                 }
                 else
                 {	
-                    return $this->EmptyError();
+                    return $this->JSONResponse(400, 'Debes rellenar todos los campos', '');
                 }  	
             }
             else
             {
-                return $this->AuthError();
+                return $this->JSONResponse(400, 'Error de autenticación', '');
             }
         }
         catch (Exception $e)
         {
-            return $this->ServerError();
+            return $this->JSONResponse(500, 'Error del servidor : $e', '');
         }
 	}
 
@@ -130,14 +114,14 @@ class Controller_Song extends Controller_Base
             }
             else
             {
-                return $this->AuthError();
+                return $this->JSONResponse(400, 'Error de autenticación', '');
             }
 
             if($user->rol['type'] == 'admin')
             {
             	if(!isset($_POST['id']))
                 {
-                    return $this->EmptyError();
+                    return $this->JSONResponse(400, 'Debes rellenar todos los campos', '');
                 }
 
                 $input = $_POST;
@@ -175,31 +159,21 @@ class Controller_Song extends Controller_Base
 	                    $query->execute();
 	                    $query = null;
 	                }
-
-                    $response = $this->response(array(
-                        'code' => 200,
-                        'message' => 'Operacion realizada con exito',
-                        'data' => ''
-                    ));
+                	return $this->JSONResponse(200, 'Operacion realizada con exito', '');
                 }
                 else
                 {
-                    $response = $this->response(array(
-                    'code' => 400,
-                    'message' => 'Esa cancion no existe',
-                    'data' => ''
-                    ));
-                    return $response;
+                	return $this->JSONResponse(400, 'Esa cancion no existe', '');
                 }
             }
             else
             {
-                return $this->AuthError();
+                return $this->JSONResponse(400, 'Error de autenticación', '');
             }
         }
         catch (Exception $e)
         {
-            return $this->ServerError();
+            return $this->JSONResponse(500, 'Error del servidor : $e', '');
         }
     }
 }

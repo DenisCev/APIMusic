@@ -9,19 +9,14 @@ class Controller_User extends Controller_Base
                 !isset($_POST['pass']) || 
                 !isset($_POST['email']))
             {
-                return $this->EmptyError();
+                return $this->JSONResponse(400, 'Debes rellenar todos los campos', '');
             }
 
             $input = $_POST;
           
             if(empty($input['name']) || strlen($input['name']) < 4)
             {
-                $response = $this->response(array(
-                    'code' => 400,
-                    'message' => 'El nombre debe de tener almenos 4 caracteres',
-                    'data' => ''
-                ));
-                return $response;
+                return $this->JSONResponse(400, 'El nombre debe de tener almenos 4 caracteres', '');
             }
 
             $usersName = Model_Users::find('all', array(
@@ -38,22 +33,12 @@ class Controller_User extends Controller_Base
 
             if(!empty($usersName))
             {
-                $response = $this->response(array(
-                    'code' => 400,
-                    'message' => 'Ese usuario ya esta registrado',
-                    'data' => ''
-                ));
-                return $response;
+                return $this->JSONResponse(400, 'Ese usuario ya esta registrado', '');
             }
 
             if(!empty($usersEmail))
             {
-                $response = $this->response(array(
-                    'code' => 400,
-                    'message' => 'Ese email ya esta registrado',
-                    'data' => ''
-                ));
-                return $response;
+                return $this->JSONResponse(400, 'Ese email ya esta registrado', '');
             }
 
             $checkUserName = $this->validatedName($input['name']);
@@ -112,56 +97,31 @@ class Controller_User extends Controller_Base
                             $list->user = Model_Users::find($user->id);
                             $list->save();
 
-                            $response = $this->response(array(
-                                'code' => 200,
-                                'message' => 'Usuario creado con exito',
-                                'data' => ''
-                            ));
-                            return $response;
+                            return $this->JSONResponse(200, 'Usuario creado con exito', '');
                         }
                         else
                         {
-                            $response = $this->response(array(
-                                'code' => 400,
-                                'message' => 'Rol no encontrado',
-                                'data' => ''
-                            ));
-                            return $response;
+                            return $this->JSONResponse(400, 'Rol no encontrado', '');
                         }
                     }
                     else
                     {
-                        $response = $this->response(array(
-                            'code' => 400,
-                            'message' => $checkPass['msgError'],
-                            'data' => ''
-                        ));
-                        return $response;
+                        return $this->JSONResponse(400, $checkPass['msgError'], '');
                     }
                 }
                 else
                 {
-                    $response = $this->response(array(
-                        'code' => 400,
-                        'message' => 'Formato de email no valido',
-                        'data' => ''
-                    ));
-                    return $response;
+                    return $this->JSONResponse(400, 'Formato de email no valido', '');
                 }
             }
             else
             {
-                $response = $this->response(array(
-                    'code' => 400,
-                    'message' => $checkUserName['msgError'],
-                    'data' => ''
-                ));
-                return $response;
+                return $this->JSONResponse(400, $checkUserName['msgError'], '');
             }
     	}
         catch (Exception $e)
     	{
-    		return $this->ServerError();
+    		return $this->JSONResponse(500, 'Error del servidor : $e', '');
     	}
     }
 
@@ -172,7 +132,7 @@ class Controller_User extends Controller_Base
             if(!isset($_GET['name']) || 
                 !isset($_GET['pass'])) 
             {
-                return $this->EmptyError();
+                return $this->JSONResponse(400, 'Debes rellenar todos los campos', '');
             }
 
             $input = $_GET;
@@ -190,12 +150,7 @@ class Controller_User extends Controller_Base
 
                 if(empty($users))
                 {
-                    $response = $this->response(array(
-                        'code' => 400,
-                        'message' => 'Usuario incorrecto',
-                        'data' => ''
-                    ));
-                    return $response;
+                    return $this->JSONResponse(400, 'Usuario incorrecto', '');
                 }
 
                 $userData = self::obtainData($users);
@@ -235,37 +190,21 @@ class Controller_User extends Controller_Base
                         $list->user = Model_Users::find($userData['id']);
                         $list->save();
                     }
-
-                    $response = $this->response(array(
-                        'code' => 200,
-                        'message' => 'Usuario logeado',
-                        'data' => $displayInfo
-                    ));
-                    return $response;
+                    return $this->JSONResponse(200, 'Usuario logeado', $displayInfo);
                 } 
                 else 
                 {
-                    $response = $this->response(array(
-                        'code' => 400,
-                        'message' => 'Clave incorrecta',
-                        'data' => ''
-                    ));
-                    return $response;
+                    return $this->JSONResponse(400, 'Clave incorrecta', '');
                 }
             }
             else
             {
-                $response = $this->response(array(
-                    'code' => 400,
-                    'message' => $checkPass['msgError'],
-                    'data' => ''
-                ));
-                return $response;
+                return $this->JSONResponse(400, $checkPass['msgError'], '');
             }
         }
         catch (Exception $e)
         {
-            return $this->ServerError();
+            return $this->JSONResponse(500, 'Error del servidor : $e', '');
         }
     }
 
@@ -276,7 +215,7 @@ class Controller_User extends Controller_Base
             if(!isset($_GET['name']) || 
                 !isset($_GET['email'])) 
             {
-                return $this->EmptyError();
+                return $this->JSONResponse(400, 'Debes rellenar todos los campos', '');
             }
 
             $input = $_GET;
@@ -290,28 +229,18 @@ class Controller_User extends Controller_Base
 
             if(empty($users))
             {
-                $response = $this->response(array(
-                    'code' => 400,
-                    'message' => 'Usuario o email incorrectos',
-                    'data' => ''
-                ));
-                return $response;
+                return $this->JSONResponse(400, 'Usuario o email incorrectos', '');
             }
 
             $userData = $this->obtainData($users);
 
             $token = $this->encodeInfo($userData);
 
-            $response = $this->response(array(
-                'code' => 200,
-                'message' => 'Usuario encontrado',
-                'data' => $token
-            ));
-            return $response;
+            return $this->JSONResponse(200, 'Usuario encontrado', '');
         }
         catch (Exception $e)
         {
-            return $this->ServerError();
+            return $this->JSONResponse(500, 'Error del servidor : $e', '');
         }
     }
     
@@ -325,7 +254,7 @@ class Controller_User extends Controller_Base
             {
                 if(!isset($_POST['pass'])) 
                 {
-                    return $this->EmptyError();
+                    return $this->JSONResponse(400, 'Debes rellenar todos los campos', '');
                 }   
 
                 $info = $this->getUserInfo();
@@ -343,30 +272,21 @@ class Controller_User extends Controller_Base
                     $query->value('pass', $pass);
                     $query->execute();
 
-                    $response = $this->response(array(
-                        'code' => 200,
-                        'message' => 'Contraseña cambiada con exito',
-                        'data' => ''
-                    ));
+                    return $this->JSONResponse(200, 'Contraseña cambiada con exito', '');
                 }
                 else
                 {
-                    $response = $this->response(array(
-                        'code' => 400,
-                        'message' => $checkPass['msgError'],
-                        'data' => ''
-                    ));
-                    return $response;
+                    return $this->JSONResponse(400, $checkPass['msgError'], '');
                 }
             }
             else
             {
-                return $this->AuthError();
+                return $this->JSONResponse(400, 'Error de autenticación', '');
             }
         }
         catch (Exception $e)
         {
-            return $this->ServerError();
+            return $this->JSONResponse(500, 'Error del servidor : $e', '');
         }
     }
 
@@ -380,12 +300,7 @@ class Controller_User extends Controller_Base
             {
                 if(!isset($_POST['id'])) 
                 {
-                    $response = $this->response(array(
-                        'code' => 400,
-                        'message' => 'Debes rellenar todos los campos',
-                        'data' => ''
-                    ));
-                    return $response;
+                    return $this->JSONResponse(400, 'Debes rellenar todos los campos', '');
                 } 
 
                 $info = $this->getUserInfo();
@@ -397,31 +312,21 @@ class Controller_User extends Controller_Base
                     $user = Model_Users::find($info['id']);
                     $user->delete();
 
-                    $response = $this->response(array(
-                        'code' => 200,
-                        'message' => 'usuario borrado',
-                        'data' => ''
-                    ));
-                    return $response;
+                    return $this->JSONResponse(200, 'Usuario borrado', '');
                 }
                 else
                 {
-                    $response = $this->response(array(
-                        'code' => 400,
-                        'message' => 'No puedes borrar a otros usuarios',
-                        'data' => ''
-                    ));
-                    return $response;
+                    return $this->JSONResponse(400, 'No puedes borrar a otros usuarios', '');
                 } 
             }
             else
             {
-                return $this->AuthError();
+                return $this->JSONResponse(400, 'Error de autenticación', '');
             }
         }
         catch (Exception $e)
         {
-            return $this->ServerError();
+            return $this->JSONResponse(500, 'Error del servidor : $e', '');
         }    
 	}
 
@@ -435,7 +340,7 @@ class Controller_User extends Controller_Base
             {
                 if(!isset($_POST['urlPhoto'])) 
                 {
-                    return $this->EmptyError();
+                    return $this->JSONResponse(400, 'Debes rellenar todos los campos', '');
                 }   
 
                 $info = $this->getUserInfo();
@@ -449,21 +354,16 @@ class Controller_User extends Controller_Base
                 $query->value('urlPhoto', $path);
                 $query->execute();
 
-                $response = $this->response(array(
-                    'code' => 200,
-                    'message' => 'Foto cambiada con exito',
-                    'data' => $path
-                ));
-                return $response;
+                return $this->JSONResponse(200, 'Foto cambiada con exito', $path);
             }
             else
             {
-                return $this->AuthError();
+                return $this->JSONResponse(400, 'Error de autenticación', '');
             }
         }
         catch (Exception $e)
         {
-            return $this->ServerError();
+            return $this->JSONResponse(500, 'Error del servidor : $e', '');
         }
     }
 }
