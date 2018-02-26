@@ -5,8 +5,7 @@ class Controller_Song extends Controller_Base
 
     public function post_create()
     {
-        try
-        {
+        
             $authenticated = $this->requestAuthenticate();
 
             if($authenticated == true)
@@ -31,9 +30,9 @@ class Controller_Song extends Controller_Base
 
                 $input = $_POST;
 
-                $path = 'http://' . $_SERVER['SERVER_NAME'] . '/denis/APIMusic/public/assets/music/' . $input['urlPhoto'] . '.mp3';
+                $path = 'http://' . $_SERVER['SERVER_NAME'] . '/denis/APIMusic/public/assets/music/' . $input['urlSong'] . '.mp3';
 
-                $song = new Model_Pieces();
+                $song = new Model_Songs();
                 $song->name = $input['name'];
                 $song->artist = $input['artist'];
                 $song->urlSong = $path;
@@ -46,11 +45,7 @@ class Controller_Song extends Controller_Base
             {
             	return $this->JSONResponse(400, 'Error de autenticación', '');
             }
-        }
-        catch (Exception $e)
-        {
-            return $this->JSONResponse(500, 'Error del servidor : $e', '');
-        }
+        
     }
 
 	public function post_delete()

@@ -1,5 +1,5 @@
 <?php 
-class Controller_Config extends Controller_Base
+class Controller_Intconfig extends Controller_Base
 {
 
     public function post_createRols()
@@ -37,8 +37,7 @@ class Controller_Config extends Controller_Base
 
     public function post_createAdmin()
     {
-    	try
-        {
+    	
             $rols = Model_Rols::find('all', array(
                 'where' => array(
                     array('type', 'admin')
@@ -62,7 +61,7 @@ class Controller_Config extends Controller_Base
 
                 if($adminCount >= $maxAdmins)
                 {
-                    return $this->JSONResponse(400, 'Aviso: La configuracion de administradores ya ha sido realizada', count($users));
+                    return $this->JSONResponse(400, 'Aviso: La configuracion de administradores ya ha sido realizada', $adminCount);
                 }
 
                 if(!isset($_POST['name']) || !isset($_POST['pass']) || !isset($_POST['email']))
@@ -106,7 +105,8 @@ class Controller_Config extends Controller_Base
 
                 $admin->pass = $pass;
 
-                if(!empty($rols)){
+                if(!empty($rols))
+                {
                     foreach ($rols as $key => $rol)
                     {
                         $admin->rol = Model_Rols::find($rol->id);
@@ -125,22 +125,7 @@ class Controller_Config extends Controller_Base
 
                     Model_Users::find($admin->id)->privacity = Model_Privacity::find($privacity->id)->save();
 
-                    $lists = Model_Users::find('all', array(
-                        'where' => array(
-                            array('name', 'Las mas escuchadas')
-                        )
-                    ));
-
-                    if(empty($lists))
-                    {
-                        $list = new Model_Lists();
-                        $list->name = 'Las mas escuchadas';
-                        $list->editable = 0;
-                        $list->user = Model_Users::find($admin->id);
-                        $list->save();
-                    }
-
-                    return $this->JSONResponse(400, 'Admin creado con exito', '');
+                    return $this->JSONResponse(200, 'Admin creado con exito', '');
                 }
                 else
                 {
@@ -151,11 +136,7 @@ class Controller_Config extends Controller_Base
             {
                 return $this->JSONResponse(400, 'Aviso: Los roles aun no an sido configurados', '');
             }
-    	}
-        catch (Exception $e)
-        {
-            return $this->JSONResponse(500, 'Error del servidor : $e', '');
-        }
+    	
     }
 
     public function post_createLists()

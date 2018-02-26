@@ -185,7 +185,7 @@ class Controller_List extends Controller_Base
                 {
                     foreach ($userLists as $key => $list)
                     {
-                        $lists[] = $list['name'];
+                        $lists[] = $list;
                     }
                     return $this->JSONResponse(200, 'Listas obtenidas', $lists);
                 }
@@ -229,26 +229,20 @@ class Controller_List extends Controller_Base
                 ));
 
                 if(!empty($songsFromList)){
-                    foreach ($songsFromList as $key => $songList)
+                    foreach ($songsFromList as $key => $list)
                     {
-                        $songsOfList[] = Model_Pieces::find($songList->id_piece);
+                        $songsOfList[] = Model_Songs::find($list->id_song);
                     }
 
                     foreach ($songsOfList as $key => $song)
                     {
-                        $songs[] = array(
-                            "name" => $song->name,
-                            "artist" => $song->artist,
-                            "urlSong" => $song->urlSong,
-                            "reproductions" => $song->reproductions
-                        );
-
+                        $songs[] = $song;
                     }  
                     return $this->JSONResponse(200, 'Canciones encontradas', $songs);
                 }
                 else
                 {
-                    return $this->JSONResponse(400, 'No existen piezas en esa la lista', '');
+                    return $this->JSONResponse(400, 'No existen canciones en esa la lista', '');
                 }
             }
             else
@@ -346,7 +340,7 @@ class Controller_List extends Controller_Base
 
             if($authenticated == true)
             {
-                if(!isset($_POST['name']))
+                if(!isset($_POST['id']))
                 {
                     return $this->JSONResponse(400, 'Debes rellenar todos los campos', '');
                 }
@@ -357,7 +351,7 @@ class Controller_List extends Controller_Base
                 $userLists = Model_Lists::find('all', array(
                     'where' => array(
                         array('id_user', $info['id']),
-                        array('name', $input['name']),
+                        array('id', $input['id']),
                     ),
                 ));
 

@@ -85,18 +85,6 @@ class Controller_User extends Controller_Base
 
                             Model_Users::find($user->id)->privacity = Model_Privacity::find($privacity->id)->save();
 
-                            $list = new Model_Lists();
-                            $list->name = 'Por descubrir';
-                            $list->editable = 0;
-                            $list->user = Model_Users::find($user->id);
-                            $list->save();
-
-                            $list = new Model_Lists();
-                            $list->name = 'Ultimas escuchadas';
-                            $list->editable = 0;
-                            $list->user = Model_Users::find($user->id);
-                            $list->save();
-
                             return $this->JSONResponse(200, 'Usuario creado con exito', '');
                         }
                         else
@@ -174,22 +162,60 @@ class Controller_User extends Controller_Base
                         'id' => $userData['id']
                     );
 
-                    $listName = Model_Lists::find('all', array(
+                    $user = Model_Users::find($userData['id']);
+
+                    if($user->rol['type'] == 'admin')
+                    {
+                        $lists = Model_Lists::find('all', array(
+                            'where' => array(
+                                array('name', 'Las mas escuchadas')
+                            )
+                        ));
+
+                        if(count($lists) == 0)
+                        {
+                            $list = new Model_Lists();
+                            $list->name = 'Las mas escuchadas';
+                            $list->editable = 0;
+                            //$list->id_user = $admin->id;
+                            $list->user = Model_Users::find($userData['id']);
+                            $list->save();
+                        }
+
+                        return $this->JSONResponse(200, 'Admin logeado', $displayInfo);
+                    }
+
+                    $listFav = Model_Lists::find('all', array(
                         'where' => array(
-                            array('name', 'Favorites'),
+                            array('name', 'Favourites'),
                             array('editable', 0),
                             array('id_user', $userData['id'])
                         ),
                     ));
 
-                    if(empty($listName))
+                    if(empty($listFav))
                     {
                         $list = new Model_Lists();
-                        $list->name = 'Favorites';
+                        $list->name = 'Favourites';
+                        $list->editable = 0;
+                        $list->user = Model_Users::find($userData['id']);
+                        $list->save();
+                        $list = null;
+
+                        $list = new Model_Lists();
+                        $list->name = 'Por descubrir';
+                        $list->editable = 0;
+                        $list->user = Model_Users::find($userData['id']);
+                        $list->save();
+                        $list = null;
+
+                        $list = new Model_Lists();
+                        $list->name = 'Ultimas escuchadas';
                         $list->editable = 0;
                         $list->user = Model_Users::find($userData['id']);
                         $list->save();
                     }
+                    
                     return $this->JSONResponse(200, 'Usuario logeado', $displayInfo);
                 } 
                 else 

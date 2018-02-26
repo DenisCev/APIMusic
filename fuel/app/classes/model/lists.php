@@ -11,14 +11,14 @@ class Model_Lists extends Orm\Model
     );
 
 	protected static $_belongs_to = array(
-	    'user' => array(
-	        'key_from' => 'id_user',
-	        'model_to' => 'Model_Users',
-	        'key_to' => 'id',
-	        'cascade_save' => true,
-	        'cascade_delete' => false,
-	    )
-	);
+        'user' => array(
+            'key_from' => 'id_user',
+            'model_to' => 'Model_Users',
+            'key_to' => 'id',
+            'cascade_save' => true,
+            'cascade_delete' => false
+        )
+    );
 
     protected static $_many_many = array(
 	    'song' => array(
@@ -29,7 +29,7 @@ class Model_Lists extends Orm\Model
 	        'model_to' => 'Model_Songs',
 	        'key_to' => 'id',
 	        'cascade_save' => true,
-	        'cascade_delete' => false,
+	        'cascade_delete' => false
 	    )
 	);
 }

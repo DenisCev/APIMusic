@@ -24,17 +24,17 @@ class Model_Users extends Orm\Model
             'model_to' => 'Model_Privacity',
             'key_to' => 'id_user',
             'cascade_save' => true,
-            'cascade_delete' => false,
+            'cascade_delete' => false
         )
     );
 
     protected static $_has_many = array(
-        'list' => array(
+        'lists' => array(
             'key_from' => 'id',
             'model_to' => 'Model_Lists',
             'key_to' => 'id_user',
             'cascade_save' => true,
-            'cascade_delete' => true
+            'cascade_delete' => false
         ),
         'new' => array(
             'key_from' => 'id',
@@ -60,8 +60,8 @@ class Model_Users extends Orm\Model
             'key_from' => 'id',
             'key_through_from' => 'id_follower_user',
             'table_through' => 'follow',
-            'key_through_to' => 'id_follower_user',
-            'model_to' => 'Model_Users',
+            'key_through_to' => 'id_followed_user',
+            'model_to' => 'Model_Follow',
             'key_to' => 'id',
             'cascade_save' => true,
             'cascade_delete' => false
@@ -70,12 +70,11 @@ class Model_Users extends Orm\Model
             'key_from' => 'id',
             'key_through_from' => 'id_followed_user',
             'table_through' => 'follow',
-            'key_through_to' => 'id_followed_user',
-            'model_to' => 'Model_Users',
+            'key_through_to' => 'id_follower_user',
+            'model_to' => 'Model_Follow',
             'key_to' => 'id',
             'cascade_save' => true,
             'cascade_delete' => false
         )
     );
-
 }

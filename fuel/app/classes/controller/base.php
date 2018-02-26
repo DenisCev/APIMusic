@@ -100,17 +100,17 @@ class Controller_Base extends Controller_Rest
         $validChars = ctype_alnum($name);
 
         if($validChars == false){
-            $msgError = "La nombre debe tener solo caracteres alfanumericos";
+            $msgError = "El nombre debe tener solo caracteres alfanumericos";
             return array('is' => false, 'msgError' => $msgError);
         }
 
         if(strlen($name) < 3){
-            $msgError = "La nombre debe tener al menos 3 caracteres";
+            $msgError = "El nombre debe tener al menos 3 caracteres";
             return array('is' => false, 'msgError' => $msgError);
         }
 
         if(strlen($name) > 16){
-            $msgError = "La nombre no puede tener más de 16 caracteres";
+            $msgError = "El nombre no puede tener más de 16 caracteres";
             return array('is' => false, 'msgError' => $msgError);
         }
 

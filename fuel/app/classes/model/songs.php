@@ -1,7 +1,7 @@
 <?php  
-class Model_Pieces extends Orm\Model
+class Model_Songs extends Orm\Model
 {
-	protected static $_table_name = 'pieces';
+	protected static $_table_name = 'songs';
 	protected static $_primary_key = array('id');
 	protected static $_properties = array(
         'id'=> array('data_type' => 'int'), 
