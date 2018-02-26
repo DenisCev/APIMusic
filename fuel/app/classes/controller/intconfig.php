@@ -37,7 +37,8 @@ class Controller_Intconfig extends Controller_Base
 
     public function post_createAdmin()
     {
-    	
+    	try
+        {
             $rols = Model_Rols::find('all', array(
                 'where' => array(
                     array('type', 'admin')
@@ -71,13 +72,9 @@ class Controller_Intconfig extends Controller_Base
 
                 $input = $_POST;
 
-                $ADname = $input['name'];
-                $ADpass = $input['pass'];
-                $ADemail = $input['email'];
-
                 $usersName = Model_Users::find('all', array(
                     'where' => array(
-                        array('name', $ADname)
+                        array('name', $input['name'])
                     )
                 ));
 
@@ -88,7 +85,7 @@ class Controller_Intconfig extends Controller_Base
 
                 $usersEmail = Model_Users::find('all', array(
                     'where' => array(
-                        array('email', $ADemail)
+                        array('email', $input['email'])
                     )
                 ));
 
@@ -97,46 +94,78 @@ class Controller_Intconfig extends Controller_Base
                     return $this->JSONResponse(400, 'Ese email ya esta registrado', '');
                 }
 
-                $admin = new Model_Users();
-                $admin->name = $ADname;
-                $admin->email = $ADemail;
+                $checkUserName = $this->validatedName($input['name']);
 
-                $pass = $this->SecurePass($ADpass);
-
-                $admin->pass = $pass;
-
-                if(!empty($rols))
+                if($checkUserName['is'] == true)
                 {
-                    foreach ($rols as $key => $rol)
+                    $checkEmail = $this->validatedEmail($input['email']);
+
+                    if($checkEmail == true)
                     {
-                        $admin->rol = Model_Rols::find($rol->id);
+                        $checkPass = $this->validatedPass($input['pass']);
+
+                        if($checkPass['is'] == true)
+                        {
+                            $admin = new Model_Users();
+                            $admin->name = $input['name'];
+                            $admin->email = $input['email'];
+
+                            $pass = $this->SecurePass($input['pass']);
+
+                            $admin->pass = $pass;
+
+                            if(!empty($rols))
+                            {
+                                foreach ($rols as $key => $rol)
+                                {
+                                    $admin->rol = Model_Rols::find($rol->id);
+                                }
+
+                                $admin->save();
+
+                                $privacity = new Model_Privacity();
+                                $privacity->profile = 0;
+                                $privacity->friends = 0;
+                                $privacity->lists = 0;
+                                $privacity->notifications = 0;
+                                $privacity->location = 0;
+                                $privacity->user = Model_Users::find($admin->id);
+                                $privacity->save();
+
+                                Model_Users::find($admin->id)->privacity = Model_Privacity::find($privacity->id)->save();
+
+                                return $this->JSONResponse(200, 'Admin creado con exito', '');
+                            }
+                            else
+                            {
+                                return $this->JSONResponse(400, 'Rol no encontrado', '');
+                            }
+                        }
+                        else
+                        {
+                            return $this->JSONResponse(400, $checkPass['msgError'], '');
+                        }
                     }
-
-                    $admin->save();
-
-                    $privacity = new Model_Privacity();
-                    $privacity->profile = 0;
-                    $privacity->friends = 0;
-                    $privacity->lists = 0;
-                    $privacity->notifications = 0;
-                    $privacity->location = 0;
-                    $privacity->user = Model_Users::find($admin->id);
-                    $privacity->save();
-
-                    Model_Users::find($admin->id)->privacity = Model_Privacity::find($privacity->id)->save();
-
-                    return $this->JSONResponse(200, 'Admin creado con exito', '');
+                    else
+                    {
+                        return $this->JSONResponse(400, 'Formato de email no valido', '');
+                    }
                 }
                 else
                 {
-                    return $this->JSONResponse(400, 'Rol no encontrado', '');
+                    return $this->JSONResponse(400, $checkUserName['msgError'], '');
                 }
+                
             }
             else
             {
                 return $this->JSONResponse(400, 'Aviso: Los roles aun no an sido configurados', '');
             }
-    	
+    	}
+        catch (Exception $e)
+        {
+            return $this->JSONResponse(500, 'Error del servidor : $e', '');
+        }
     }
 
     public function post_createLists()
