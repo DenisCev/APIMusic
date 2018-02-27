@@ -115,6 +115,7 @@ class Controller_User extends Controller_Base
 
     public function get_login()
     {
+        
         try
         {
             if(!isset($_GET['name']) || 
@@ -147,6 +148,8 @@ class Controller_User extends Controller_Base
                 {
                     $token = $this->encodeInfo($userData);
 
+                    $user = Model_Users::find($userData['id']);
+
                     $displayInfo = array(
                         'name' => $userData['name'],
                         'email' => $userData['email'],
@@ -156,14 +159,13 @@ class Controller_User extends Controller_Base
                         'birthday' => $userData['birthday'],
                         'city' => $userData['city'],
                         'id_rol' => $userData['id_rol'],
+                        'rol' => $user->rol['type'],
                         'urlPhoto' => $userData['urlPhoto'],
                         'id_device' => $userData['id_device'],
                         'token' => $token,
                         'id' => $userData['id']
                     );
-
-                    $user = Model_Users::find($userData['id']);
-
+                    
                     if($user->rol['type'] == 'admin')
                     {
                         $lists = Model_Lists::find('all', array(
@@ -177,7 +179,13 @@ class Controller_User extends Controller_Base
                             $list = new Model_Lists();
                             $list->name = 'Las mas escuchadas';
                             $list->editable = 0;
-                            //$list->id_user = $admin->id;
+                            $list->user = Model_Users::find($userData['id']);
+                            $list->save();
+                            $list = null;
+
+                            $list = new Model_Lists();
+                            $list->name = 'Todas las canciones';
+                            $list->editable = 0;
                             $list->user = Model_Users::find($userData['id']);
                             $list->save();
                         }
@@ -187,7 +195,7 @@ class Controller_User extends Controller_Base
 
                     $listFav = Model_Lists::find('all', array(
                         'where' => array(
-                            array('name', 'Favourites'),
+                            array('name', 'Favoritas'),
                             array('editable', 0),
                             array('id_user', $userData['id'])
                         ),
@@ -196,7 +204,7 @@ class Controller_User extends Controller_Base
                     if(empty($listFav))
                     {
                         $list = new Model_Lists();
-                        $list->name = 'Favourites';
+                        $list->name = 'Favoritas';
                         $list->editable = 0;
                         $list->user = Model_Users::find($userData['id']);
                         $list->save();

@@ -18,34 +18,25 @@ class Controller_List extends Controller_Base
 
                 $input = $_POST;
 
-                $checkName = $this->validatedName($input['name']);
+                $listName = Model_Lists::find('all', array(
+                    'where' => array(
+                        array('name', $input['name']),
+                        array('id_user', $info['id'])
+                    ),
+                ));
 
-                if($checkName['is'] == true)
+                if(!empty($listName))
                 {
-                    $listName = Model_Lists::find('all', array(
-                        'where' => array(
-                            array('name', $input['name']),
-                            array('id_user', $info['id'])
-                        ),
-                    ));
-
-                    if(!empty($listName))
-                    {
-                        return $this->JSONResponse(400, 'Esa lista ya existe', '');
-                    }
-
-                    $list = new Model_Lists();
-                    $list->name = $input['name'];
-                    $list->editable = 1;
-                    $list->user = Model_Users::find($info['id']);
-                    $list->save();
-
-                    return $this->JSONResponse(200, 'Lista creada', '');
+                    return $this->JSONResponse(400, 'Esa lista ya existe', '');
                 }
-                else
-                {
-                    return $this->JSONResponse(400, $checkName['msgError'], '');
-                }
+
+                $list = new Model_Lists();
+                $list->name = $input['name'];
+                $list->editable = 1;
+                $list->user = Model_Users::find($info['id']);
+                $list->save();
+
+                return $this->JSONResponse(200, 'Lista creada', '');
             }
             else
             {
@@ -183,9 +174,39 @@ class Controller_List extends Controller_Base
 
                 if(!empty($userLists))
                 {
+                    $songsOfList = array();
                     foreach ($userLists as $key => $list)
                     {
-                        $lists[] = $list;
+                        $songsFromList = Model_Add::find('all', array(
+                            'where' => array(
+                                array('id_list', $list->id)
+                            ),
+                        ));
+
+                        if(!empty($songsFromList)){
+                            unset($songsOfList);
+                            $songsOfList = array();
+                            
+                            foreach ($songsFromList as $key => $RelList)
+                            {
+                                $songsOfList[] = Model_Songs::find($RelList->id_song);
+                            }
+                        }
+                        else
+                        {
+                            unset($songsOfList);
+                            $songsOfList = array();
+                        }
+
+                        $userList = array(
+                            'id' => $list->id,
+                            'name' => $list->name,
+                            'id_user' => $list->id_user,
+                            'editable' => $list->editable,
+                            'songs' => $songsOfList
+                        );
+
+                        $lists[] = $userList;
                     }
                     return $this->JSONResponse(200, 'Listas obtenidas', $lists);
                 }
