@@ -134,11 +134,14 @@ class Controller_List extends Controller_Base
                 ));
 
                 if(!empty($songsFromList)){
+                    $idSong = 0;
                     foreach ($songsFromList as $key => $song)
                     {
+                        $idSong = $song->id_song;
+                        
                         $song->delete();
                     }
-                    return $this->JSONResponse(200, 'Cancion eliminada de la lista', '');
+                    return $this->JSONResponse(200, 'Cancion eliminada de la lista', $idSong);
                 }
                 else
                 {
@@ -208,6 +211,7 @@ class Controller_List extends Controller_Base
 
                         $lists[] = $userList;
                     }
+
                     return $this->JSONResponse(200, 'Listas obtenidas', $lists);
                 }
                 else
@@ -226,7 +230,7 @@ class Controller_List extends Controller_Base
         }
     }
 
-    public function get_songsFromList()
+    public function get_songs()
     {
         try
         {
@@ -234,36 +238,28 @@ class Controller_List extends Controller_Base
 
             if($authenticated == true)
             {
-                if(!isset($_GET['id_list']))
-                {
-                    return $this->JSONResponse(400, 'Debes rellenar todos los campos', '');
-                }
-
                 $info = $this->getUserInfo();
 
                 $input = $_GET;
 
-                $songsFromList = Model_Add::find('all', array(
-                    'where' => array(
-                        array('id_list', $input['id_list'])
-                    ),
-                ));
+                $allSongs = Model_Songs::find('all');
 
-                if(!empty($songsFromList)){
-                    foreach ($songsFromList as $key => $list)
-                    {
-                        $songsOfList[] = Model_Songs::find($list->id_song);
-                    }
-
-                    foreach ($songsOfList as $key => $song)
+                if(!empty($allSongs)){
+                    foreach ($allSongs as $key => $song)
                     {
                         $songs[] = $song;
-                    }  
-                    return $this->JSONResponse(200, 'Canciones encontradas', $songs);
+                    }
+                    $userList = array(
+                        'name' => "Todas las canciones",
+                        'songs' => $songs
+                    );
+                    $listSongs[] = $userList;
+
+                    return $this->JSONResponse(200, 'Canciones obtenidas', $listSongs);
                 }
                 else
                 {
-                    return $this->JSONResponse(400, 'No existen canciones en esa la lista', '');
+                    return $this->JSONResponse(401, 'No existen canciones', '');
                 }
             }
             else

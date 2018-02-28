@@ -98,6 +98,7 @@ class Controller_Song extends Controller_Base
                     $song = Model_Songs::find($input['id']);
                     if(!empty($song))
                     {
+
                         $song->delete();
                 		return $this->JSONResponse(200, 'Cancion borrada', '');
                     }
@@ -121,6 +122,47 @@ class Controller_Song extends Controller_Base
             return $this->JSONResponse(500, 'Error del servidor : $e', '');
         }
 	}
+
+    public function post_upReproductions()
+    {
+       try
+        {
+            $authenticated = $this->requestAuthenticate();
+
+            if($authenticated == true)
+            {
+                if(!isset($_POST['id'])) 
+                {
+                    return $this->JSONResponse(400, 'Debes rellenar todos los campos', '');
+                }   
+
+                $info = $this->getUserInfo();
+
+                $input = $_POST;
+
+                $song = Model_Songs::find($input['id']);
+
+                $actualRep = $song->reproductions;
+
+                $newReproductionNumber = $actualRep + 1;
+                
+                $query = DB::update('songs');
+                $query->where('id', '=', $input['id']);
+                $query->value('reproductions', $newReproductionNumber);
+                $query->execute();
+
+                return $this->JSONResponse(200, 'reproductions updated', '');
+            }
+            else
+            {
+                return $this->JSONResponse(400, 'Error de autenticación', '');
+            }
+        }
+        catch (Exception $e)
+        {
+            return $this->JSONResponse(500, 'Error del servidor : $e', '');
+        }
+    }
 
 	public function post_edit()
     {
@@ -172,11 +214,9 @@ class Controller_Song extends Controller_Base
 
 	                if(array_key_exists('urlSong', $input))
 	                {
-	                	$path = 'http://' . $_SERVER['SERVER_NAME'] . '/denis/APIMusic/public/assets/music/' . $input['urlPhoto'] . '.mp3';
-
 	                	$query = DB::update('songs');
 	                    $query->where('id', '=', $input['id']);
-	                    $query->value('urlSong', $path);
+	                    $query->value('urlSong', $input['urlSong']);
 	                    $query->execute();
 	                    $query = null;
 	                }
