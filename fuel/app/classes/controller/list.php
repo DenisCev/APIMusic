@@ -158,7 +158,7 @@ class Controller_List extends Controller_Base
             return $this->JSONResponse(500, 'Error del servidor : $e', '');
         }
     }
-
+    //Web
     public function get_lists()
     {
         try
@@ -229,7 +229,7 @@ class Controller_List extends Controller_Base
             return $this->JSONResponse(500, 'Error del servidor : $e', '');
         }
     }
-
+    //iOS
     public function get_userLists()
     {
         try
@@ -249,8 +249,10 @@ class Controller_List extends Controller_Base
                 if(!empty($userLists))
                 {
                     $songsOfList = array();
+                    $num = 0;
                     foreach ($userLists as $key => $list)
                     {
+                        $num = $num + 1;
                         $songsFromList = Model_Add::find('all', array(
                             'where' => array(
                                 array('id_list', $list->id)
@@ -271,19 +273,17 @@ class Controller_List extends Controller_Base
                             unset($songsOfList);
                             $songsOfList = array();
                         }
-
-                        $userList = array(
+                        // A causa del formato en iOS -> $num
+                        $lists[$num] = array(
                             'id' => $list->id,
                             'name' => $list->name,
                             'id_user' => $list->id_user,
                             'editable' => $list->editable,
                             'songs' => $songsOfList
                         );
-
-                        //$lists[] = $userList;
                     }
 
-                    return $this->JSONResponse(200, 'Listas obtenidas', $userList);
+                    return $this->JSONResponse(200, 'Listas obtenidas', $lists);
                 }
                 else
                 {
@@ -331,6 +331,55 @@ class Controller_List extends Controller_Base
                 else
                 {
                     return $this->JSONResponse(401, 'No existen canciones', '');
+                }
+            }
+            else
+            {
+                return $this->JSONResponse(400, 'Error de autenticación', '');
+            }
+        }
+        catch (Exception $e)
+        {
+            return $this->JSONResponse(500, 'Error del servidor : $e', '');
+        }
+    }
+
+    public function get_songsFromList()
+    {
+        try
+        {
+            if(!isset($_GET['id_list']))
+            {
+                return $this->JSONResponse(400, 'Debes rellenar todos los campos', '');
+            }
+
+            $authenticated = $this->requestAuthenticate();
+
+            if($authenticated == true)
+            {
+
+                $info = $this->getUserInfo();
+
+                $input = $_GET;
+
+                $allSongs = Model_Add::find('all', array(
+                    'where' => array(
+                        array('id_list', $input['id_list'])
+                    ),
+                ));
+                $num = 0;
+                if(!empty($allSongs)){
+                    foreach ($allSongs as $key => $songGroup)
+                    {
+                        $num = $num + 1;
+                        $songs[$num] = Model_Songs::find($songGroup['id_song']);
+                    }
+                    
+                    return $this->JSONResponse(200, 'Canciones obtenidas', $songs);
+                }
+                else
+                {
+                    return $this->JSONResponse(400, 'No existen canciones', '');
                 }
             }
             else
