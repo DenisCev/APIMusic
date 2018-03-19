@@ -230,6 +230,77 @@ class Controller_List extends Controller_Base
         }
     }
 
+    public function get_userLists()
+    {
+        try
+        {
+            $authenticated = $this->requestAuthenticate();
+
+            if($authenticated == true)
+            {
+                $info = $this->getUserInfo();
+
+                $userLists = Model_Lists::find('all', array(
+                    'where' => array(
+                        array('id_user', $info['id'])
+                    )
+                ));
+
+                if(!empty($userLists))
+                {
+                    $songsOfList = array();
+                    foreach ($userLists as $key => $list)
+                    {
+                        $songsFromList = Model_Add::find('all', array(
+                            'where' => array(
+                                array('id_list', $list->id)
+                            ),
+                        ));
+
+                        if(!empty($songsFromList)){
+                            unset($songsOfList);
+                            $songsOfList = array();
+                            
+                            foreach ($songsFromList as $key => $RelList)
+                            {
+                                $songsOfList[] = Model_Songs::find($RelList->id_song);
+                            }
+                        }
+                        else
+                        {
+                            unset($songsOfList);
+                            $songsOfList = array();
+                        }
+
+                        $userList = array(
+                            'id' => $list->id,
+                            'name' => $list->name,
+                            'id_user' => $list->id_user,
+                            'editable' => $list->editable,
+                            'songs' => $songsOfList
+                        );
+
+                        //$lists[] = $userList;
+                    }
+
+                    return $this->JSONResponse(200, 'Listas obtenidas', $userList);
+                }
+                else
+                {
+                    return $this->JSONResponse(400, 'No existen listas asociadas a esta cuenta', '');
+                }
+            }
+            else
+            {
+                return $this->JSONResponse(400, 'Error de autenticación', '');
+            }
+        }
+        catch (Exception $e)
+        { 
+            return $this->JSONResponse(500, 'Error del servidor : $e', '');
+        }
+    }
+
     public function get_songs()
     {
         try
